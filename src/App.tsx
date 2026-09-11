@@ -9,11 +9,11 @@ interface Task {
   priority: TaskPriority;
   deadline: string;
 }
-// вставить апи и колонку задач!!!!!!!
-const API_KEY = "";
+
+const API_KEY = "-oauX4sJNp8MF2zlDp2igO1ib-KyeTY15549407vaYfZ_0Qe0ODt4oJ7RCqDKZRq";
 const TASKS_URL = "https://yougile.com/api-v2/task-list";
 
-const MY_COLUMN_ID = "";
+const MY_COLUMN_ID = "0c5287ca-ae16-4dba-8dcc-e03cb52c970a";
 
 const PRIORITY_STICKER_ID = "de4408e1-ff26-4e43-81bb-d11dd87651db";
 const IMPORTANT_STATES = [
@@ -119,7 +119,30 @@ const getTaskCategory = (task: Task): TaskCategory => {
   return 'normal';
 };
 
-const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
+// Кол-во колонок и масштаб шрифтов в зависимости от числа задач
+const getLayout = (count: number): { cols: number; scale: number } => {
+  if (count <= 1) return { cols: 1, scale: 1.6 };
+  if (count <= 2) return { cols: 2, scale: 1.4 };
+  if (count <= 3) return { cols: 3, scale: 1.2 };
+  if (count <= 4) return { cols: 2, scale: 1.2 };
+  if (count <= 6) return { cols: 3, scale: 1.0 };
+  if (count <= 8) return { cols: 4, scale: 0.9 };
+  if (count <= 12) return { cols: 4, scale: 0.8 };
+  if (count <= 16) return { cols: 4, scale: 0.7 };
+  if (count <= 20) return { cols: 5, scale: 0.6 };
+  if (count <= 25) return { cols: 5, scale: 0.55 };
+  if (count <= 30) return { cols: 6, scale: 0.5 };
+  return { cols: 6, scale: 0.45 };
+};
+
+const GAP = 12;
+
+const TaskCard: React.FC<{
+  task: Task;
+  scale: number;
+  cardWidth: string;
+  cardHeight: string;
+}> = ({ task, scale, cardWidth, cardHeight }) => {
   const category = getTaskCategory(task);
   const isImportant = task.priority === 'Важно';
   const isOverdue =
@@ -128,23 +151,48 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
 
   const cardStyle: React.CSSProperties = {
     ...styles.card,
+    width: cardWidth,
+    height: cardHeight,
+    padding: `${Math.round(20 * scale)}px ${Math.round(16 * scale)}px`,
     ...(category === 'important' ? styles.cardImportant : {}),
     ...(category === 'urgent' ? styles.cardUrgent : {}),
     ...(category === 'overdueNormal' ? styles.cardOverdueNormal : {}),
     ...(category === 'overdueImportant' ? styles.cardOverdueImportant : {}),
   };
 
+  const titleStyle: React.CSSProperties = {
+    ...styles.cardTitle,
+    fontSize: `${Math.round(20 * scale)}px`,
+    marginBottom: `${Math.round(10 * scale)}px`,
+  };
+
+  const descStyle: React.CSSProperties = {
+    ...styles.cardDesc,
+    fontSize: `${Math.round(14 * scale)}px`,
+    marginBottom: `${Math.round(16 * scale)}px`,
+  };
+
+  const metaStyle: React.CSSProperties = {
+    ...styles.meta,
+    gap: `${Math.round(8 * scale)}px`,
+  };
+
+  const metaTextStyle: React.CSSProperties = {
+    ...styles.metaText,
+    fontSize: `${Math.round(14 * scale)}px`,
+  };
+
   return (
     <div style={cardStyle}>
       <div style={styles.cardContent}>
-        <h3 style={styles.cardTitle}>{task.title}</h3>
+        <h3 style={titleStyle}>{task.title}</h3>
 
         {task.description && (
-          <p style={styles.cardDesc}>{task.description}</p>
+          <p style={descStyle}>{task.description}</p>
         )}
 
-        <div style={styles.meta}>
-          <p style={styles.metaText}>
+        <div style={metaStyle}>
+          <p style={metaTextStyle}>
             Приоритет:{' '}
             <span
               style={{
@@ -158,7 +206,7 @@ const TaskCard: React.FC<{ task: Task }> = ({ task }) => {
 
           <p
             style={{
-              ...styles.metaText,
+              ...metaTextStyle,
               ...(isOverdue ? styles.deadlineOverdue : {}),
             }}
           >
@@ -241,6 +289,12 @@ const App: React.FC = () => {
     });
   }, [tasks]);
 
+  const { cols, scale } = getLayout(sortedTasks.length);
+  const rows = Math.max(1, Math.ceil(sortedTasks.length / cols));
+
+  const cardWidth = `calc((100% - ${(cols - 1) * GAP}px) / ${cols})`;
+  const cardHeight = `calc((100% - ${(rows - 1) * GAP}px) / ${rows})`;
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -255,7 +309,13 @@ const App: React.FC = () => {
 
       <div style={styles.grid}>
         {sortedTasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard
+            key={task.id}
+            task={task}
+            scale={scale}
+            cardWidth={cardWidth}
+            cardHeight={cardHeight}
+          />
         ))}
       </div>
     </div>
@@ -264,96 +324,101 @@ const App: React.FC = () => {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    minHeight: '100vh',
+    height: '100vh',
     backgroundColor: '#f3f4f6',
-    padding: '40px 20px',
+    padding: '16px',
     width: '100%',
     boxSizing: 'border-box',
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    display: 'flex',
+    flexDirection: 'column',
+    overflow: 'hidden',
   },
   header: {
     width: '100%',
-    margin: '0 auto 30px auto',
+    margin: '0 auto 12px auto',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    flexShrink: 0,
   },
-  mainTitle: { fontSize: '32px', color: '#9ca3af', fontWeight: 600, margin: 0 },
+  mainTitle: { fontSize: '24px', color: '#9ca3af', fontWeight: 600, margin: 0 },
   errorBox: {
     maxWidth: '600px',
-    margin: '20px auto',
-    padding: '16px 20px',
+    margin: '8px auto',
+    padding: '10px 16px',
     backgroundColor: '#fee2e2',
     border: '1px solid #ef4444',
     borderRadius: '8px',
     color: '#991b1b',
-    fontSize: '14px',
+    fontSize: '13px',
     textAlign: 'center',
+    flexShrink: 0,
   },
   grid: {
+    flex: 1,
     width: '100%',
-    margin: '0 auto',
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: '20px',
+    alignContent: 'center',
+    gap: `${GAP}px`,
+    overflow: 'hidden',
+    minHeight: 0,
   },
   card: {
     position: 'relative',
     backgroundColor: '#fff',
-    borderRadius: '12px',
-    padding: '24px',
+    borderRadius: '10px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     textAlign: 'center',
+    justifyContent: 'center',
     boxShadow:
-      '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+      '0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
     border: '2px solid #e5e7eb',
-    transition: 'border-color 0.2s, box-shadow 0.2s',
-    width: 'calc((100% - 40px) / 3)',
+    overflow: 'hidden',
     boxSizing: 'border-box',
   },
   cardImportant: { borderColor: '#f59e0b' },
   cardUrgent: { borderColor: '#ef4444' },
   cardOverdueNormal: {
     borderColor: '#ef4444',
-    borderWidth: '8px',
-    boxShadow: '0 0 0 2px #fecaca, 0 4px 8px rgba(239, 68, 68, 0.3)',
+    borderWidth: '6px',
+    boxShadow: '0 0 0 2px #fecaca, 0 2px 6px rgba(239, 68, 68, 0.3)',
   },
   cardOverdueImportant: {
     borderColor: '#ef4444',
-    borderWidth: '8px',
-    boxShadow: '0 0 0 2px #fecaca, 0 4px 8px rgba(239, 68, 68, 0.3)',
+    borderWidth: '6px',
+    boxShadow: '0 0 0 2px #fecaca, 0 2px 6px rgba(239, 68, 68, 0.3)',
   },
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
   },
   cardTitle: {
-    fontSize: '20px',
     color: '#111827',
-    margin: '0 0 10px 0',
     fontWeight: 500,
+    margin: 0,
+    wordBreak: 'break-word',
   },
   cardDesc: {
-    fontSize: '14px',
     color: '#4b5563',
-    margin: '0 0 20px 0',
-    lineHeight: 1.5,
+    lineHeight: 1.4,
+    margin: 0,
     wordBreak: 'break-word',
   },
   meta: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '10px',
-    marginTop: 'auto',
   },
-  metaText: { fontSize: '14px', color: '#374151', margin: 0 },
+  metaText: { color: '#374151', margin: 0 },
   deadlineOverdue: { color: '#ef4444', textDecoration: 'line-through' },
   deadlineUrgent: { color: '#ef4444' },
 };
