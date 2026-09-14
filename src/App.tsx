@@ -1,4 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import {
+  API_KEY,
+  TASKS_URL,
+  MY_COLUMN_ID,
+  PRIORITY_STICKER_ID,
+  IMPORTANT_STATES,
+  REFRESH_INTERVAL,
+  DESCRIPTION_MAX_LENGTH,
+} from './config';
 
 type TaskPriority = 'Важно' | 'Обычно';
 
@@ -10,15 +19,6 @@ interface Task {
   deadline: string;
 }
 
-const API_KEY = import.meta.env.API_KEY;
-const TASKS_URL = import.meta.env.TASKS_URL;
-const MY_COLUMN_ID = import.meta.env.MY_COLUMN_ID;
-
-const PRIORITY_STICKER_ID = import.meta.env.PRIORITY_STICKER_ID;
-const IMPORTANT_STATES = (import.meta.env.IMPORTANT_STATES || "").split(",");
-
-const REFRESH_INTERVAL = Number(import.meta.env.REFRESH_INTERVAL);
-const DESCRIPTION_MAX_LENGTH = Number(import.meta.env.DESCRIPTION_MAX_LENGTH);
 
 const stripHtml = (html: string): string => {
   if (!html) return '';
