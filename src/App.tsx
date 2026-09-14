@@ -80,6 +80,7 @@ const parseDeadline = (raw: any): string => {
 };
 
 const mapYouGileTask = (raw: any): Task | null => {
+  console.log('Задача целиком:', raw);
   if (MY_COLUMN_ID && raw.columnId !== MY_COLUMN_ID) return null;
   if (raw.completed === true || raw.archived === true) return null;
 
