@@ -8,16 +8,13 @@ string => {
     return value;
 };
 
-const API_KEY = "КЛЮЧ_СЮДА";
-const TASKS_URL = "https://yougile.com/api-v2/task-list";
+export const API_KEY = required("API_KEY"); 
+export const TASKS_URL = required("TASKS_URL"); 
 
-const MY_COLUMN_ID = "айди колонки сюда";
+export const MY_COLUMN_ID = required("MY_COLUMN_ID"); 
 
-const PRIORITY_STICKER_ID = "de4408e1-ff26-4e43-81bb-d11dd87651db";
-const IMPORTANT_STATES = [
-  "dcf5fcc816b0",
-  "eb85a8d85664",
-];
+export const PRIORITY_STICKER_ID = required("PRIORITY_STICKER_ID"); 
+export const IMPORTANT_STATES = required("IMPORTANT_STATES");
 
-const REFRESH_INTERVAL = 30000;
-const DESCRIPTION_MAX_LENGTH = 150;
+export const REFRESH_INTERVAL = parseInt(required("REFRESH_INTERVAL")); 
+export const DESCRIPTION_MAX_LENGTH = parseInt(required("DESCRIPTION_MAX_LENGTH")); 
