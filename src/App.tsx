@@ -10,19 +10,15 @@ interface Task {
   deadline: string;
 }
 
-const API_KEY = "-oauX4sJNp8MF2zlDp2igO1ib-KyeTY15549407vaYfZ_0Qe0ODt4oJ7RCqDKZRq";
-const TASKS_URL = "https://yougile.com/api-v2/task-list";
+const API_KEY = import.meta.env.API_KEY;
+const TASKS_URL = import.meta.env.TASKS_URL;
+const MY_COLUMN_ID = import.meta.env.MY_COLUMN_ID;
 
-const MY_COLUMN_ID = "0c5287ca-ae16-4dba-8dcc-e03cb52c970a";
+const PRIORITY_STICKER_ID = import.meta.env.PRIORITY_STICKER_ID;
+const IMPORTANT_STATES = (import.meta.env.IMPORTANT_STATES || "").split(",");
 
-const PRIORITY_STICKER_ID = "de4408e1-ff26-4e43-81bb-d11dd87651db";
-const IMPORTANT_STATES = [
-  "dcf5fcc816b0",
-  "eb85a8d85664",
-];
-
-const REFRESH_INTERVAL = 30000;
-const DESCRIPTION_MAX_LENGTH = 150;
+const REFRESH_INTERVAL = Number(import.meta.env.REFRESH_INTERVAL);
+const DESCRIPTION_MAX_LENGTH = Number(import.meta.env.DESCRIPTION_MAX_LENGTH);
 
 const stripHtml = (html: string): string => {
   if (!html) return '';
@@ -119,7 +115,6 @@ const getTaskCategory = (task: Task): TaskCategory => {
   return 'normal';
 };
 
-// Кол-во колонок и масштаб шрифтов в зависимости от числа задач
 const getLayout = (count: number): { cols: number; scale: number } => {
   if (count <= 1) return { cols: 1, scale: 1.6 };
   if (count <= 2) return { cols: 2, scale: 1.4 };
